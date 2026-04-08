@@ -1,12 +1,13 @@
-import { AVAILABLE_PLACES } from "../data.js";
-
-export default function Places() {
+export default function Places({ onAddRemovePlace, availablePlaces }) {
   return (
     <div className="mt-4">
-      <ul className="grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-6 [&>*:nth-child(odd)_button:hover]:rotate-[5deg] [&>*:nth-child(odd)_button:focus-visible]:rotate-[5deg] [&>*:nth-child(even)_button:hover]:-rotate-[5deg] [&>*:nth-child(even)_button:focus-visible]:-rotate-[5deg]">
-        {AVAILABLE_PLACES.map((place) => (
-          <li className="relative">
-            <button className="cursor-pointer rounded-md transition-all duration-200 ease-out hover:shadow-[0_0_8px_4px_#f0b100] focus-visible:shadow-[0_0_8px_4px_#f0b100] focus:outline-0">
+      <ul className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-6 [&>*:nth-child(odd)_button:hover]:rotate-[5deg] [&>*:nth-child(odd)_button:focus-visible]:rotate-[5deg] [&>*:nth-child(even)_button:hover]:-rotate-[5deg] [&>*:nth-child(even)_button:focus-visible]:-rotate-[5deg]">
+        {availablePlaces.map((place) => (
+          <li key={place.id} className="relative">
+            <button
+              onClick={() => onAddRemovePlace(place.id)}
+              className="cursor-pointer rounded-md transition-all duration-200 ease-out hover:shadow-[0_0_8px_4px_#f0b100] focus-visible:shadow-[0_0_8px_4px_#f0b100] focus:outline-0 animate-[slideUp_0.3s_ease-in_1]"
+            >
               <img
                 src={place.image.src}
                 alt={place.image.alt}

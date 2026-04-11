@@ -5,9 +5,13 @@ import { AVAILABLE_PLACES } from "./data";
 import { sortPlacesByDistance } from "./loc.js";
 import Modal from "./components/Modal.jsx";
 
+const storedPlacesFromLocal =
+  JSON.parse(localStorage.getItem("selectedPlaces")) || [];
+
 function App() {
-  const [selectedPlaces, setSelectedPlaces] = useState([]);
+  const [selectedPlaces, setSelectedPlaces] = useState(storedPlacesFromLocal);
   const [sortedPlaces, setSortedPlaces] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const modalRef = useRef(null);
   const selectedPlace = useRef(null);
 
@@ -25,18 +29,32 @@ function App() {
 
   // Handle Add place to the list
   function handleAddPlace(selectedPlaceId) {
+    const storedPlaces =
+      JSON.parse(localStorage.getItem("selectedPlaces")) || [];
+    if (!storedPlaces.includes(selectedPlaceId)) {
+      localStorage.setItem(
+        "selectedPlaces",
+        JSON.stringify([selectedPlaceId, ...storedPlaces]),
+      );
+    }
+
     setSelectedPlaces((prevPlaces) => {
+      let updatedPlaces = [];
+
       if (!prevPlaces.includes(selectedPlaceId)) {
-        return [selectedPlaceId, ...prevPlaces];
+        updatedPlaces = [selectedPlaceId, ...prevPlaces];
       } else {
-        return prevPlaces;
+        updatedPlaces = prevPlaces;
       }
+
+      return updatedPlaces;
     });
   }
 
   // Handle select place to remove/keep
   function handleSelectPlace(placeId) {
     modalRef.current.open();
+    setIsModalOpen(true);
     selectedPlace.current = placeId;
   }
 
@@ -44,15 +62,24 @@ function App() {
   function handleRemovePlace() {
     const placeId = selectedPlace.current;
 
+    const storedPlaces =
+      JSON.parse(localStorage.getItem("selectedPlaces")) || [];
+    localStorage.setItem(
+      "selectedPlaces",
+      JSON.stringify(storedPlaces.filter((place) => place !== placeId)),
+    );
+
     setSelectedPlaces((prevPlaces) => {
       return prevPlaces.filter((place) => place !== placeId);
     });
 
     modalRef.current.close();
+    setIsModalOpen(false);
   }
 
   // Close modal dialog
   function handleStopRemovePlace() {
+    setIsModalOpen(false);
     modalRef.current.close();
   }
 
@@ -67,6 +94,7 @@ function App() {
         ref={modalRef}
         onRemovePlace={handleRemovePlace}
         onStopRemovePlace={handleStopRemovePlace}
+        isModalOpen={isModalOpen}
       />
       <Places
         title="I'd like to visit..."
